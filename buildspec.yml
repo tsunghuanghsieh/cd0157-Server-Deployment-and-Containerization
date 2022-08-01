@@ -37,24 +37,28 @@ phases:
         - echo $REPOSITORY_URI
         - echo $TAG
         - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI:$TAG"'@' simple_jwt_api.yml
+        - cat simple_jwt_api.yml
         - $(aws ecr get-login --no-include-email)
         - export KUBECONFIG=$HOME/.kube/config
         - echo `ls -l`
   build:
     commands:
-      # - docker build --tag $REPOSITORY_URI:$TAG .
-      - docker build --tag tsungh/04project .
+      - docker build --tag $REPOSITORY_URI:$TAG .
+      # - docker build --tag tsungh/04project .
 
   post_build:
     commands:
-      # - docker push $REPOSITORY_URI:$TAG
-      - docker push tsungh/04project
+      - docker push $REPOSITORY_URI:$TAG
+      # - docker push tsungh/04project
       - echo $EKS_CLUSTER_NAME
       - echo $EKS_KUBECTL_ROLE_ARN
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_KUBECTL_ROLE_ARN
-      - kubectl apply -f deployment.yaml
-      # - printf '[{"name":"simple_jwt_api","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > build.json
-      - printf '[{"name":"simple_jwt_api","imageUri":"%s"}]' tsungh/04project > build.json
+      - kubectl apply -f simple_jwt_api.yml
+      - kubectl get services simple-jwt-api -o wide
+      - kubectl get services simple-jwt-api-pipeline -o wide
+      - kubectl get services 04-project-deployment -o wide
+      - printf '[{"name":"simple_jwt_api","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > build.json
+      # - printf '[{"name":"simple_jwt_api","imageUri":"%s"}]' tsungh/04project > build.json
 artifacts:
   files: build.json
 env:
