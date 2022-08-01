@@ -34,37 +34,25 @@ phases:
   pre_build:
       commands:
         - TAG="$REPOSITORY_NAME.$REPOSITORY_BRANCH.$ENVIRONMENT_NAME.$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
-        - echo $REPOSITORY_URI
-        - echo $TAG
         - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI:$TAG"'@' simple_jwt_api.yml
-        - cat simple_jwt_api.yml
         - $(aws ecr get-login --no-include-email)
         - export KUBECONFIG=$HOME/.kube/config
         - echo `ls -l`
   build:
     commands:
       - docker build --tag $REPOSITORY_URI:$TAG .
-      # - docker build --tag tsungh/04project .
 
   post_build:
     commands:
       - docker push $REPOSITORY_URI:$TAG
-      # - docker push tsungh/04project
       - echo $EKS_CLUSTER_NAME
       - echo $EKS_KUBECTL_ROLE_ARN
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_KUBECTL_ROLE_ARN
-      - aws sts get-caller-identity --query Account --output text
-      - cat trust.json
-      - ls -l
-      - cat $HOME/.kube/config
-      - kubectl get -n kube-system configmap/aws-auth -o yaml > aws-auth-patch.yaml
-      - cat aws-auth-patch.yaml
       - kubectl apply -f simple_jwt_api.yml
-      # - kubectl get services simple-jwt-api -o wide
-      # - kubectl get services simple-jwt-api-pipeline -o wide
-      # - kubectl get services 04-project-deployment -o wide
+      - kubectl get services simple-jwt-api -o wide
+      - kubectl get services simple-jwt-api-pipeline -o wide
+      - kubectl get services 04-project-deployment -o wide
       - printf '[{"name":"simple_jwt_api","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > build.json
-      # - printf '[{"name":"simple_jwt_api","imageUri":"%s"}]' tsungh/04project > build.json
 artifacts:
   files: build.json
 env:
