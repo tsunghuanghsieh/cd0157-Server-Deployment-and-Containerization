@@ -55,6 +55,7 @@ phases:
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_KUBECTL_ROLE_ARN
       - aws sts get-caller-identity --query Account --output text
       - cat trust.json
+      - ls -l
       - cat $HOME/.kube/config
       - kubectl get -n kube-system configmap/aws-auth -o yaml > aws-auth-patch.yaml
       - cat aws-auth-patch.yaml
