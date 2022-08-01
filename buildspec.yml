@@ -53,7 +53,8 @@ phases:
       - echo $EKS_CLUSTER_NAME
       - echo $EKS_KUBECTL_ROLE_ARN
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_KUBECTL_ROLE_ARN
-      - ls -l
+      - aws sts get-caller-identity --query Account --output text
+      - cat trust.json
       - kubectl apply -f simple_jwt_api.yml
       # - kubectl get services simple-jwt-api -o wide
       # - kubectl get services simple-jwt-api-pipeline -o wide
