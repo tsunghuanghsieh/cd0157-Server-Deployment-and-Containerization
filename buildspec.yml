@@ -54,7 +54,7 @@ phases:
       - echo $EKS_KUBECTL_ROLE_ARN
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --role-arn $EKS_KUBECTL_ROLE_ARN
       - kubectl help
-      # - kubectl apply -f simple_jwt_api.yml
+      - kubectl apply -f simple_jwt_api.yml
       # - kubectl get services simple-jwt-api -o wide
       # - kubectl get services simple-jwt-api-pipeline -o wide
       # - kubectl get services 04-project-deployment -o wide
