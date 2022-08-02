@@ -36,7 +36,7 @@ with open(ConfigmapFile, 'r')  as fin:
     yamlobj = yaml.load(fin, Loader=yaml.SafeLoader)
     mapRoles = yamlobj["data"]["mapRoles"]
     if mapRoles.find(newRole) == -1:
-        mapRoles = "{}{}".format(mapRoles, newRole)
+        mapRoles = "{}{}".format(newRole, mapRoles)
     fin.close()
 
 with open(ConfigmapFile, 'w')  as fout:
